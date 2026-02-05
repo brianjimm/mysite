@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}tradioAI Ecommerce{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="data:,">
+    <style>
+        /* AI Assistant Button Styling */
+        .ai-assistant-link {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333 !important;
+            padding: 8px 18px !important;
+            border-radius: 25px;
+            font-weight: 700;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-assistant-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+            background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+        }
+
+        .ai-badge {
+            background: #ff4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .ai-icon {
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="{{ url_for('home') }}">
+                    <i class="fas fa-store"></i>
+                    tradioAI
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}">Home</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('view_cart') }}">
+                        <i class="fas fa-shopping-cart"></i> Cart
+                    </a>
+                    <a href="{{ url_for('order_history') }}">Orders</a>
+                    <a href="{{ url_for('chat') }}">
+                        <i class="fas fa-comments"></i> Chat
+                    </a>
+
+                    <!-- AI ASSISTANT LINK - NEW! -->
+                    <a href="{{ url_for('ai_assistant_page') }}" class="ai-assistant-link">
+                        <i class="fas fa-robot ai-icon"></i>
+                        AI Assistant
+                        <span class="ai-badge">NEW</span>
+                    </a>
+
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                    <span class="user-welcome">Hello, {{ current_user.username }}!</span>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('signup') }}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            {% if category == 'error' %}
+                                <i class="fas fa-exclamation-circle"></i>
+                            {% elif category == 'success' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif category == 'info' %}
+                                <i class="fas fa-info-circle"></i>
+                            {% endif %}
+                            {{ message }}
+                            <button class="flash-close" onclick="this.parentElement.style.display='none'">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>tradioAI</h3>
+                <p>Your one-stop shop for construction materials, fresh produce, fashion, electronics, and automotive needs.</p>
+                <p style="margin-top: 15px; color: #ffd700; font-weight: 600;">
+                    <i class="fas fa-robot"></i> Now with AI-Powered Shopping Assistant!
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('ai_assistant_page') }}"><i class="fas fa-robot"></i> AI Assistant</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('chat') }}">Contact Us</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <p><i class="fas fa-phone"></i> +254711604885</p>
+                <p><i class="fas fa-envelope"></i> tradioai2025@gmail.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> 123 Nyali, impala street, Mombasa, Kenya</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 tradioAI. All rights reserved. | Powered by Claude AI 🤖</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

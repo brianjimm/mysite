@@ -1,0 +1,452 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mpesa-payment-container">
+    <div class="mpesa-payment-wrapper">
+        <div class="mpesa-payment-card">
+            <div class="mpesa-card-header">
+                <div class="mpesa-logo-section">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/320px-M-PESA_LOGO-01.svg.png"
+                         alt="M-Pesa" class="mpesa-logo">
+                </div>
+                <h2><i class="fas fa-mobile-alt"></i> Pay with M-Pesa</h2>
+                <p class="payment-subtitle">Secure and instant payment</p>
+            </div>
+
+            <div class="mpesa-card-body">
+                <div class="order-summary-box">
+                    <div class="order-summary-header">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Order Summary</span>
+                    </div>
+                    <div class="order-summary-content">
+                        <div class="summary-row">
+                            <span>Order Number:</span>
+                            <strong>#{{ order.id }}</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Order Date:</span>
+                            <span>{{ order.created_at.strftime('%B %d, %Y') }}</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Total Amount:</span>
+                            <strong class="amount-highlight">KSH {{ "{:,.2f}".format(order.total_amount) }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" class="mpesa-payment-form">
+                    <div class="form-group">
+                        <label for="phone_number">
+                            <i class="fas fa-phone"></i> M-Pesa Phone Number
+                        </label>
+                        <input type="tel"
+                               name="phone_number"
+                               id="phone_number"
+                               class="form-control mpesa-phone-input"
+                               placeholder="0712345678 or 0112345678"
+                               value="{{ current_user.phone or '' }}"
+                               pattern="[0-9]{10}"
+                               required>
+                        <small class="form-text">Enter the number registered with M-Pesa</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-mpesa">
+                        <i class="fas fa-lock"></i> Pay KSH {{ "{:,.2f}".format(order.total_amount) }}
+                    </button>
+                </form>
+
+                <div class="payment-steps-box">
+                    <h4><i class="fas fa-info-circle"></i> How it works:</h4>
+                    <ol class="payment-steps-list">
+                        <li>
+                            <span class="step-icon">1</span>
+                            <span class="step-text">Enter your M-Pesa registered phone number above</span>
+                        </li>
+                        <li>
+                            <span class="step-icon">2</span>
+                            <span class="step-text">Click the "Pay" button</span>
+                        </li>
+                        <li>
+                            <span class="step-icon">3</span>
+                            <span class="step-text">You'll receive an STK Push notification on your phone</span>
+                        </li>
+                        <li>
+                            <span class="step-icon">4</span>
+                            <span class="step-text">Enter your M-Pesa PIN to confirm payment</span>
+                        </li>
+                        <li>
+                            <span class="step-icon">5</span>
+                            <span class="step-text">Wait for payment confirmation</span>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="payment-security-badges">
+                    <div class="security-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>Secure</span>
+                    </div>
+                    <div class="security-badge">
+                        <i class="fas fa-bolt"></i>
+                        <span>Instant</span>
+                    </div>
+                    <div class="security-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Protected</span>
+                    </div>
+                </div>
+
+                <div class="payment-footer">
+                    <a href="{{ url_for('order_history') }}" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* M-Pesa Payment Styles */
+.mpesa-payment-container {
+    padding: 40px 20px;
+    min-height: 80vh;
+}
+
+.mpesa-payment-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mpesa-payment-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.mpesa-card-header {
+    background: linear-gradient(135deg, #00a651 0%, #008c44 100%);
+    color: white;
+    padding: 40px 30px;
+    text-align: center;
+}
+
+.mpesa-logo-section {
+    margin-bottom: 20px;
+}
+
+.mpesa-logo {
+    max-width: 150px;
+    height: auto;
+    background: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.mpesa-card-header h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.payment-subtitle {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.mpesa-card-body {
+    padding: 30px;
+}
+
+.order-summary-box {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-left: 4px solid #00a651;
+}
+
+.order-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.order-summary-header i {
+    color: #00a651;
+}
+
+.order-summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    color: #2c3e50;
+}
+
+.summary-row.total-row {
+    border-top: 2px solid #00a651;
+    padding-top: 15px;
+    margin-top: 10px;
+    font-size: 1.2rem;
+}
+
+.amount-highlight {
+    color: #00a651;
+    font-size: 1.5rem;
+}
+
+.mpesa-payment-form {
+    margin-bottom: 30px;
+}
+
+.mpesa-payment-form .form-group {
+    margin-bottom: 25px;
+}
+
+.mpesa-payment-form label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.mpesa-phone-input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.mpesa-phone-input:focus {
+    outline: none;
+    border-color: #00a651;
+    box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+}
+
+.form-text {
+    display: block;
+    margin-top: 8px;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.btn-mpesa {
+    width: 100%;
+    background: linear-gradient(135deg, #00a651 0%, #008c44 100%);
+    color: white;
+    padding: 18px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+}
+
+.btn-mpesa:hover {
+    background: linear-gradient(135deg, #008c44 0%, #00753a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 166, 81, 0.4);
+}
+
+.btn-mpesa:active {
+    transform: translateY(0);
+}
+
+.payment-steps-box {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+.payment-steps-box h4 {
+    color: #2c3e50;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.payment-steps-box h4 i {
+    color: #00a651;
+}
+
+.payment-steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.payment-steps-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.step-icon {
+    background: linear-gradient(135deg, #00a651 0%, #008c44 100%);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.step-text {
+    line-height: 1.8;
+}
+
+.payment-security-badges {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 25px;
+}
+
+.security-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: #00a651;
+}
+
+.security-badge i {
+    font-size: 1.8rem;
+}
+
+.security-badge span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.payment-footer {
+    text-align: center;
+}
+
+.btn-back {
+    color: #7f8c8d;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #f8f9fa;
+    color: #2c3e50;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .mpesa-payment-container {
+        padding: 20px 10px;
+    }
+
+    .mpesa-card-header {
+        padding: 30px 20px;
+    }
+
+    .mpesa-card-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .mpesa-card-body {
+        padding: 20px;
+    }
+
+    .amount-highlight {
+        font-size: 1.3rem;
+    }
+
+    .btn-mpesa {
+        font-size: 1.1rem;
+        padding: 15px 20px;
+    }
+
+    .payment-security-badges {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .security-badge {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .payment-steps-list li {
+        gap: 12px;
+    }
+
+    .step-text {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .mpesa-logo {
+        max-width: 120px;
+    }
+
+    .mpesa-card-header h2 {
+        font-size: 1.3rem;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .summary-row {
+        font-size: 0.95rem;
+    }
+
+    .amount-highlight {
+        font-size: 1.2rem;
+    }
+}
+</style>
+{% endblock %}

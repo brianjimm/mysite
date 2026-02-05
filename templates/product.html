@@ -1,0 +1,218 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - tradioAI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="product-detail">
+        <div class="product-detail-image">
+            {% if product.image_url %}
+                <img src="{{ url_for('static', filename='images/products/' + product.image_url) }}" alt="{{ product.name }}">
+            {% else %}
+                <!-- Fallback images if image_url is not set -->
+                {% if 'nguvu' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/nguvu.jpeg') }}" alt="Bamburi Nguvu Cement">
+                {% elif 'blue triangle' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/bluetriangle.jpeg') }}" alt="Blue Triangle Cement">
+                {% elif 'savannah' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/savannah.jpeg') }}" alt="Savannah Cement">
+                {% elif 'simba' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/simba.jpeg') }}" alt="Simba Cement">
+                {% elif 'mombasa' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/mombasa.jpeg') }}" alt="Mombasa Cement">
+                {% elif 'dumusaz' in product.name.lower() or 'mabati' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/dumu.jpeg') }}" alt="Dumusaz Mabati">
+                {% elif 'steel rod' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/steelrods.jpeg') }}" alt="Steel Rods">
+                {% elif 'spark 40' in product.name.lower() or 'spark40' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/spark40pro+.png') }}" alt="Tecno Spark 40 Pro Plus">
+                {% elif 'pop 10' in product.name.lower() or 'pop10' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/pop10.png') }}" alt="Tecno Pop 10">
+                {% elif 'itel 2166' in product.name.lower() or 'itel2166' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/itel2166.jpeg') }}" alt="Itel 2166">
+                {% elif 'oraimo' in product.name.lower() and 'charger' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/oraimocharger.jpeg') }}" alt="Oraimo Charger">
+                {% elif 'oraimo' in product.name.lower() and 'cable' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/oraimocable.png') }}" alt="Oraimo Cable">
+                {% elif 'amaya' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/amayacharger.png') }}" alt="Amaya Charger">
+                {% elif 'bulb' in product.name.lower() or 'neelux' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/bulbneelux.jpeg') }}" alt="Neelux LED Bulb">
+                {% elif 'battery' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/battery.jpg') }}" alt="Car Battery">
+                {% elif 'probox' in product.name.lower() and 'brake' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/frontproboxbreakpads.jpeg') }}" alt="Probox Brake Pads">
+                {% elif 'brake fluid' in product.name.lower() %}
+                    <img src="{{ url_for('static', filename='images/BRAKEFLUID.jpg') }}" alt="Brake Fluid">
+                {% elif 'bananas' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400&h=300&fit=crop&crop=center" alt="Fresh Bananas">
+                {% elif 'rice' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&h=400&fit=crop" alt="Rice">
+                {% elif 'tomatoes' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop&crop=center" alt="Fresh Tomatoes">
+                {% elif 'shoes' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&crop=center" alt="Running Shoes">
+                {% elif 'cream' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=300&fit=crop&crop=center" alt="Moisturizing Cream">
+                {% elif 't-shirt' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&h=300&fit=crop&crop=center" alt="Cotton T-Shirt">
+                {% elif 'laptop' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=300&fit=crop&crop=center" alt="Laptop">
+                {% elif 'speaker' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1545454675-3531b543be5d?w=400&h=300&fit=crop&crop=center" alt="Bluetooth Speaker">
+                {% elif 'brake' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1558489580-faa74691fdc5?w=400&h=300&fit=crop&crop=center" alt="Brake Pads">
+                {% elif 'oil' in product.name.lower() %}
+                    <img src="https://images.unsplash.com/photo-1609081219090-a6d81d3085bf?w=400&h=300&fit=crop&crop=center" alt="Engine Oil">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop&crop=center" alt="{{ product.name }}">
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="product-detail-info">
+            <h1>{{ product.name }}</h1>
+            <p class="product-category">Category: {{ product.category.name }}</p>
+            <p class="product-description">{{ product.description }}</p>
+            <div class="product-price-large">KSH {{ "%.2f"|format(product.price) }}</div>
+            <div class="product-stock">
+                {% if product.stock > 0 %}
+                    <span class="stock-available">In Stock ({{ product.stock }} available)</span>
+                {% else %}
+                    <span class="stock-unavailable">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            {% if current_user.is_authenticated and product.stock > 0 %}
+                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="quantity-form">
+                    <div class="quantity-selector">
+                        <label for="quantity">Quantity:</label>
+                        <div class="quantity-controls">
+                            <button type="button" class="quantity-btn" onclick="decrementQuantity()">-</button>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" required>
+                            <button type="button" class="quantity-btn" onclick="incrementQuantity()">+</button>
+                        </div>
+                        {% if product.stock < 10 %}
+                        <p class="stock-note">Note: Only {{ product.stock }} currently in stock. Additional quantities can be ordered and will be fulfilled when available.</p>
+                        {% endif %}
+                    </div>
+                    <div class="product-actions">
+                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                        <a href="{{ url_for('category_products', category_id=product.category_id) }}" class="btn btn-secondary">Back to Category</a>
+                    </div>
+                </form>
+            {% elif not current_user.is_authenticated %}
+                <div class="product-actions">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Login to Purchase</a>
+                    <a href="{{ url_for('category_products', category_id=product.category_id) }}" class="btn btn-secondary">Back to Category</a>
+                </div>
+            {% else %}
+                <div class="product-actions">
+                    <button class="btn btn-disabled" disabled>Out of Stock</button>
+                    <a href="{{ url_for('category_products', category_id=product.category_id) }}" class="btn btn-secondary">Back to Category</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function incrementQuantity() {
+    const input = document.getElementById('quantity');
+    let value = parseInt(input.value) || 1;
+    input.value = value + 1;
+}
+
+function decrementQuantity() {
+    const input = document.getElementById('quantity');
+    let value = parseInt(input.value) || 1;
+    if (value > 1) {
+        input.value = value - 1;
+    }
+}
+</script>
+
+<style>
+.quantity-form {
+    width: 100%;
+}
+
+.quantity-selector {
+    margin: 20px 0;
+}
+
+.quantity-selector label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.quantity-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.quantity-btn:active {
+    transform: scale(0.95);
+}
+
+.quantity-controls input[type="number"] {
+    width: 80px;
+    height: 40px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0 10px;
+}
+
+.quantity-controls input[type="number"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+/* Remove spinner arrows from number input */
+.quantity-controls input[type="number"]::-webkit-inner-spin-button,
+.quantity-controls input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-controls input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.stock-note {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 10px;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}
