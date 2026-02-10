@@ -42,6 +42,9 @@ if not ANTHROPIC_API_KEY:
     print("Please add it to your .env file")
 
 db = SQLAlchemy(app)
+    # Auto-create database tables
+with app.app_context():
+    db.create_all()
 mail = Mail(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
