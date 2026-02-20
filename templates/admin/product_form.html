@@ -1,0 +1,81 @@
+{% extends 'admin/base.html' %}
+{% block title %}{{ action }} Product{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h1>{{ '✏️ Edit' if product else '➕ Add' }} Product</h1>
+  <a href="{{ url_for('admin_products') }}" class="btn" style="background:#e2e8f0;color:#333">← Back</a>
+</div>
+
+<div class="card" style="max-width:700px">
+  <form method="POST" enctype="multipart/form-data">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Product Name *</label>
+        <input name="name" value="{{ product.name if product else '' }}" required placeholder="e.g. Nguvu Cement 50kg">
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select name="category_id" required>
+          <option value="">Select category…</option>
+          {% for c in categories %}
+          <option value="{{ c.id }}" {{ 'selected' if product and product.category_id == c.id }}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea name="description" placeholder="Short product description…">{{ product.description if product else '' }}</textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Price (KSh) *</label>
+        <input name="price" type="number" step="0.01" min="0"
+               value="{{ product.price if product else '' }}" required placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label>Stock Quantity</label>
+        <input name="stock" type="number" min="0"
+               value="{{ product.stock if product else 0 }}" placeholder="0">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Product Image</label>
+      {% if product and product.image_url %}
+        <div style="margin-bottom:10px;display:flex;align-items:center;gap:12px">
+          <img src="{{ product.image_path }}"
+               style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0"
+               onerror="this.style.display='none'">
+          <span style="font-size:13px;color:#888">Current image. Upload a new one to replace it.</span>
+        </div>
+      {% endif %}
+      <input type="file" name="image" accept="image/*" id="imageFile" onchange="previewImage(this)">
+      <div id="imgPreview" style="margin-top:10px"></div>
+      <p style="font-size:12px;color:#888;margin-top:6px">Or paste an image URL below (leave blank if uploading a file):</p>
+      <input name="image_url" type="url" placeholder="https://…"
+             value="{{ product.image_url if product and product.image_url and not product.image_url.startswith('uploads/') else '' }}">
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <button type="submit" class="btn btn-primary">💾 {{ action }} Product</button>
+      <a href="{{ url_for('admin_products') }}" class="btn" style="background:#e2e8f0;color:#333">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+function previewImage(input) {
+  const preview = document.getElementById('imgPreview');
+  preview.innerHTML = '';
+  if (input.files && input.files[0]) {
+    const img = document.createElement('img');
+    img.style = 'width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0';
+    img.src = URL.createObjectURL(input.files[0]);
+    preview.appendChild(img);
+  }
+}
+</script>
+{% endblock %}
