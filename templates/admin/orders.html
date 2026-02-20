@@ -1,0 +1,71 @@
+{% extends 'admin/base.html' %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h1>🛒 Orders ({{ orders|length }})</h1>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    {% for s in ['', 'pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'] %}
+    <a href="{{ url_for('admin_orders', status=s) }}"
+       class="btn btn-sm {{ 'btn-primary' if status_filter == s else '' }}"
+       style="{{ '' if status_filter == s else 'background:#e2e8f0;color:#333' }}">
+      {{ s if s else 'All' }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden">
+  <table class="table">
+    <thead><tr>
+      <th>#</th>
+      <th>Customer</th>
+      <th>Items</th>
+      <th>Total</th>
+      <th>Status</th>
+      <th>Date</th>
+      <th>Update Status</th>
+    </tr></thead>
+    <tbody>
+    {% for o in orders %}
+    <tr>
+      <td>#{{ o.id }}</td>
+      <td>
+        <strong>{{ o.customer.username }}</strong><br>
+        <small style="color:#888">{{ o.customer.phone or o.customer.email }}</small>
+      </td>
+      <td>
+        {% for item in o.items %}
+          <small style="display:block">{{ item.product.name }} ×{{ item.quantity }}</small>
+        {% endfor %}
+      </td>
+      <td><strong>KSh {{ '{:,.2f}'.format(o.total_amount) }}</strong></td>
+      <td>
+        <span class="badge
+          {{ 'badge-green'  if o.status in ['paid','delivered','completed'] else
+             'badge-yellow' if o.status == 'pending' else
+             'badge-blue'   if o.status in ['processing','shipped'] else
+             'badge-red' }}">
+          {{ o.status }}
+        </span>
+      </td>
+      <td>{{ o.created_at.strftime('%b %d, %Y') }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('admin_update_order_status', order_id=o.id) }}"
+              style="display:flex;gap:6px;align-items:center">
+          <select name="status"
+                  style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:4px;font-size:12px">
+            {% for s in ['pending','paid','processing','shipped','delivered','cancelled'] %}
+            <option {{ 'selected' if o.status == s }}>{{ s }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-sm btn-success">✓</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" style="text-align:center;color:#888;padding:30px">No orders found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
