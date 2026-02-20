@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login — tradioAI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .card{background:#fff;border-radius:12px;padding:40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    h2{font-size:22px;margin-bottom:8px;color:#333}
+    p{color:#888;font-size:14px;margin-bottom:24px}
+    label{display:block;margin-bottom:6px;font-size:14px;font-weight:500;color:#555}
+    input{width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:14px;margin-bottom:16px}
+    input:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.15)}
+    button{width:100%;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer}
+    button:hover{opacity:0.9}
+    .alert{padding:10px 14px;border-radius:6px;margin-bottom:16px;font-size:13px;background:#fed7d7;color:#742a2a}
+  </style>
+</head>
+<body>
+<div class="card">
+  <h2>🔐 Admin Login</h2>
+  <p>tradioAI Management Portal</p>
+  {% for cat, msg in get_flashed_messages(with_categories=true) %}
+  <div class="alert">{{ msg }}</div>
+  {% endfor %}
+  <form method="POST">
+    <label>Username</label>
+    <input name="username" type="text" required autocomplete="username">
+    <label>Password</label>
+    <input name="password" type="password" required autocomplete="current-password">
+    <button type="submit">Login to Admin Panel</button>
+  </form>
+</div>
+</body>
+</html>
