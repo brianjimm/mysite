@@ -1,0 +1,116 @@
+{% extends 'admin/base.html' %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h1>📦 Products ({{ products|length }})</h1>
+  <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">+ Add Product</a>
+</div>
+
+<div class="card" style="padding:14px 20px">
+  <form method="GET" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+    <div class="form-group" style="margin:0;flex:1;min-width:180px">
+      <label style="font-size:12px">Search</label>
+      <input name="search" value="{{ search }}" placeholder="Product name…">
+    </div>
+    <div class="form-group" style="margin:0">
+      <label style="font-size:12px">Category</label>
+      <select name="category_id">
+        <option value="">All Categories</option>
+        {% for c in categories %}
+        <option value="{{ c.id }}" {{ 'selected' if selected_category == c.id }}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('admin_products') }}" class="btn" style="background:#e2e8f0;color:#333">Clear</a>
+  </form>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden">
+  <table class="table">
+    <thead><tr>
+      <th style="width:60px">Image</th>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Price (KSh)</th>
+      <th>Stock</th>
+      <th>Actions</th>
+    </tr></thead>
+    <tbody>
+    {% for p in products %}
+    <tr>
+      <td>
+        {% if p.image_url %}
+          <img src="{{ p.image_path }}" class="img-thumb"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-thumb-missing" style="display:none">📷</div>
+        {% else %}
+          <div class="img-thumb-missing">📷</div>
+        {% endif %}
+      </td>
+      <td>
+        <strong>{{ p.name }}</strong><br>
+        <small style="color:#888">{{ (p.description or '')[:60] }}{% if p.description and p.description|length > 60 %}…{% endif %}</small>
+      </td>
+      <td>{{ p.category.name }}</td>
+      <td>
+        <span class="editable-price" data-id="{{ p.id }}"
+              style="cursor:pointer;border-bottom:1px dashed #667eea" title="Click to edit">
+          {{ '{:,.2f}'.format(p.price) }}
+        </span>
+      </td>
+      <td>
+        <span class="editable-stock" data-id="{{ p.id }}"
+              style="cursor:pointer;border-bottom:1px dashed #667eea" title="Click to edit">
+          {{ p.stock }}
+        </span>
+      </td>
+      <td style="white-space:nowrap">
+        <a href="{{ url_for('admin_edit_product', product_id=p.id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
+        <form method="POST" action="{{ url_for('admin_delete_product', product_id=p.id) }}" style="display:inline"
+              onsubmit="return confirm('Delete {{ p.name }}?')">
+          <button type="submit" class="btn btn-sm btn-danger">🗑 Del</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center;padding:30px;color:#888">No products found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+document.querySelectorAll('.editable-price').forEach(el => {
+  el.addEventListener('click', function() {
+    const id = this.dataset.id;
+    const cur = this.textContent.trim().replace(/,/g,'');
+    const val = prompt('New price for product #' + id + ' (KSh):', cur);
+    if (val === null || isNaN(parseFloat(val))) return;
+    fetch(`/admin/products/${id}/update-price`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({price: parseFloat(val)})
+    }).then(r => r.json()).then(d => {
+      if (d.success) this.textContent = parseFloat(d.price).toLocaleString('en',{minimumFractionDigits:2});
+      else alert('Error: ' + d.message);
+    });
+  });
+});
+
+document.querySelectorAll('.editable-stock').forEach(el => {
+  el.addEventListener('click', function() {
+    const id = this.dataset.id;
+    const cur = this.textContent.trim();
+    const val = prompt('New stock quantity for product #' + id + ':', cur);
+    if (val === null || isNaN(parseInt(val))) return;
+    fetch(`/admin/products/${id}/update-stock`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({stock: parseInt(val)})
+    }).then(r => r.json()).then(d => {
+      if (d.success) this.textContent = d.stock;
+      else alert('Error: ' + d.message);
+    });
+  });
+});
+</script>
+{% endblock %}
