@@ -1,0 +1,38 @@
+{% extends 'admin/base.html' %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h1>👥 Customers ({{ users|length }})</h1>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden">
+  <table class="table">
+    <thead><tr>
+      <th>#</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Address</th>
+      <th>Orders</th>
+      <th>Joined</th>
+    </tr></thead>
+    <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.id }}</td>
+      <td><strong>{{ u.username }}</strong></td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.phone or '—' }}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        {{ u.address or '—' }}
+      </td>
+      <td><span class="badge badge-blue">{{ u.orders|length }}</span></td>
+      <td>{{ u.created_at.strftime('%b %d, %Y') }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" style="text-align:center;color:#888;padding:30px">No users yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
