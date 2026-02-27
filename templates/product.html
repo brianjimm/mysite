@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - tradioAI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="product-detail">
+        <div class="product-detail-image">
+            <img src="{{ product.image_path }}" alt="{{ product.name }}">
+        </div>
+        <div class="product-detail-info">
+            <h1>{{ product.name }}</h1>
+            <p class="product-category">Category: {{ product.category.name }}</p>
+            <p class="product-description">{{ product.description }}</p>
+            <div class="product-price-large">KSH {{ "%.2f"|format(product.price) }}</div>
+            <div class="product-stock">
+                {% if product.stock > 0 %}
+                    <span class="stock-available">In Stock ({{ product.stock }} available)</span>
+                {% else %}
+                    <span class="stock-unavailable">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            {% if current_user.is_authenticated and product.stock > 0 %}
+                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="quantity-form">
+                    <div class="quantity-selector">
+                        <label for="quantity">Quantity:</label>
+                        <div class="quantity-controls">
+                            <button type="button" class="quantity-btn" onclick="decrementQuantity()">-</button>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" required>
+                            <button type="button" class="quantity-btn" onclick="incrementQuantity()">+</button>
+                        </div>
+                        {% if product.stock < 10 %}
+                        <p class="stock-note">Note: Only {{ product.stock }} currently in stock. Additional quantities can be ordered and will be fulfilled when available.</p>
+                        {% endif %}
+                    </div>
+                    <div class="product-actions">
+                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                        <a href="{{ url_for('category_products', category_id=product.category_id) }}" class="btn btn-secondary">Back to Category</a>
+                    </div>
+                </form>
+            {% elif not current_user.is_authenticated %}
+                <div class="product-actions">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Login to Purchase</a>
+                    <a href="{{ url_for('category_products', category_id=product.category_id) }}" class="btn btn-secondary">Back to Category</a>
+                </div>
+            {% else %}
+                <div class="product-actions">
+                    <button class="btn btn-disabled" disabled>Out of Stock</button>
+                    <a href="{{ url_for('category_products', category_id=product.category_id) }}" class="btn btn-secondary">Back to Category</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function incrementQuantity() {
+    const input = document.getElementById('quantity');
+    let value = parseInt(input.value) || 1;
+    input.value = value + 1;
+}
+
+function decrementQuantity() {
+    const input = document.getElementById('quantity');
+    let value = parseInt(input.value) || 1;
+    if (value > 1) {
+        input.value = value - 1;
+    }
+}
+</script>
+
+<style>
+.quantity-form {
+    width: 100%;
+}
+
+.quantity-selector {
+    margin: 20px 0;
+}
+
+.quantity-selector label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.quantity-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.quantity-btn:active {
+    transform: scale(0.95);
+}
+
+.quantity-controls input[type="number"] {
+    width: 80px;
+    height: 40px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0 10px;
+}
+
+.quantity-controls input[type="number"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.quantity-controls input[type="number"]::-webkit-inner-spin-button,
+.quantity-controls input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-controls input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.stock-note {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 10px;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}
