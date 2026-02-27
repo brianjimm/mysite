@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Welcome to Tradio AI</h1>
+        <p>Your trusted partner for all your business and personal needs</p>
+        <div class="hero-buttons">
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('signup') }}" class="btn btn-primary">Get Started</a>
+            {% endif %}
+            <a href="#categories" class="btn btn-secondary">Shop Now</a>
+        </div>
+    </div>
+</section>
+
+<section id="categories" class="categories-section">
+    <div class="container">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <div class="category-card">
+                <a href="{{ url_for('category_products', category_id=category.id) }}" class="category-link">
+                    <div class="category-image">
+                        {% if category.name == 'Fresh Produce' %}
+                            <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=400&h=250&fit=crop&crop=center" alt="Fresh Produce">
+                        {% elif category.name == 'Construction Materials' %}
+                            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=250&fit=crop&crop=center" alt="Construction Materials">
+                        {% elif category.name == 'Fashion & Cosmetics' %}
+                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&crop=center" alt="Fashion & Cosmetics">
+                        {% elif category.name == 'Electronics' %}
+                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop&crop=center" alt="Electronics">
+                        {% elif category.name == 'Cars & Spare Parts' %}
+                            <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=250&fit=crop&crop=center" alt="Cars and Spare Parts">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=250&fit=crop&crop=center" alt="{{ category.name }}">
+                        {% endif %}
+                        <div class="category-overlay">
+                            <span class="category-badge">Explore</span>
+                        </div>
+                    </div>
+                    <div class="category-content">
+                        <h3>{{ category.name }}</h3>
+                        <p>{{ category.description }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="featured-products">
+    <div class="container">
+        <h2 class="section-title">Featured Products</h2>
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-image-link">
+                    <div class="product-image">
+                        <img src="{{ product.image_path }}" alt="{{ product.name }}">
+                        {% if product.stock > 0 %}
+                            <span class="product-badge in-stock">In Stock</span>
+                        {% else %}
+                            <span class="product-badge out-of-stock">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </a>
+
+                <div class="product-info">
+                    <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-title-link">
+                        <h3>{{ product.name }}</h3>
+                    </a>
+                    <p class="product-description">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
+                    <div class="product-price">KSH {{ "%.2f"|format(product.price) }}</div>
+
+                    {% if product.stock > 0 %}
+                        <div class="stock-info">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ product.stock }} available</span>
+                        </div>
+                    {% endif %}
+
+                    {% if current_user.is_authenticated and product.stock > 0 %}
+                        <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="quick-add-form">
+                            <div class="quantity-row">
+                                <label for="home-qty-{{ product.id }}">Qty:</label>
+                                <input type="number"
+                                       id="home-qty-{{ product.id }}"
+                                       name="quantity"
+                                       value="1"
+                                       min="1"
+                                       class="qty-input-small">
+                            </div>
+                            <div class="product-actions">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                </button>
+                                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-secondary btn-sm">
+                                    View Details
+                                </a>
+                            </div>
+                        </form>
+                    {% elif not current_user.is_authenticated %}
+                        <div class="product-actions">
+                            <a href="{{ url_for('login') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-sign-in-alt"></i> Login to Buy
+                            </a>
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-secondary btn-sm">
+                                View Details
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="product-actions">
+                            <button class="btn btn-disabled btn-sm" disabled>Out of Stock</button>
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-secondary btn-sm">
+                                View Details
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+.section-title {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 40px;
+    color: #333;
+    font-weight: 700;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.category-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.category-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.category-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.category-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover .category-image img {
+    transform: scale(1.1);
+}
+
+.category-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(102, 126, 234, 0.3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.category-card:hover .category-overlay {
+    opacity: 1;
+}
+
+.category-badge {
+    background: white;
+    color: #667eea;
+    padding: 10px 24px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.category-content {
+    padding: 20px;
+}
+
+.category-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.category-content p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.product-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.product-image-link {
+    text-decoration: none;
+}
+
+.product-image {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.08);
+}
+
+.product-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.in-stock { background: #28a745; color: white; }
+.out-of-stock { background: #dc3545; color: white; }
+
+.product-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-title-link { text-decoration: none; color: inherit; }
+
+.product-info h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    min-height: 44px;
+    transition: color 0.2s ease;
+}
+
+.product-title-link:hover h3 { color: #667eea; }
+
+.product-description {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 15px 0;
+    min-height: 40px;
+}
+
+.product-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #667eea;
+    margin: 0 0 10px 0;
+}
+
+.stock-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #28a745;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.quick-add-form { margin-top: auto; }
+
+.quantity-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.quantity-row label { font-weight: 600; color: #333; font-size: 14px; }
+
+.qty-input-small {
+    width: 70px;
+    height: 36px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    padding: 0 8px;
+    transition: all 0.2s ease;
+    -moz-appearance: textfield;
+}
+
+.qty-input-small:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.qty-input-small::-webkit-inner-spin-button,
+.qty-input-small::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.product-actions { display: flex; flex-direction: column; gap: 8px; }
+
+.btn-sm {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+.btn-secondary { background: white; color: #667eea; border: 2px solid #667eea; }
+.btn-secondary:hover { background: #f8f9fa; transform: translateY(-2px); }
+.btn-disabled { background: #e9ecef; color: #6c757d; border: 2px solid #dee2e6; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+    .section-title { font-size: 26px; }
+    .categories-grid, .products-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+    .product-image { height: 180px; }
+}
+
+@media (max-width: 480px) {
+    .categories-grid, .products-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
