@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block title %}Order History - tradioAI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Order History</h2>
+    {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-header-left">
+                        <h3>Order #{{ order.id }}</h3>
+                        <span class="order-date">{{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    </div>
+                    <span class="order-status status-{{ order.status }}">{{ order.status.title() }}</span>
+                </div>
+
+                <div class="order-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Total Items:</span>
+                        <span class="summary-value">{{ order.items|sum(attribute='quantity') }} unit(s)</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Order Total:</span>
+                        <span class="summary-value total-amount">KSH {{ "%.2f"|format(order.total_amount) }}</span>
+                    </div>
+                </div>
+
+                {% if order.status == 'pending' %}
+                <div class="payment-alert">
+                    <div class="payment-alert-content">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div class="payment-alert-text">
+                            <strong>Payment Required</strong>
+                            <p>This order is awaiting payment. Complete payment with M-Pesa to process your order.</p>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('pay_with_mpesa', order_id=order.id) }}" class="btn-pay-mpesa">
+                        <i class="fas fa-mobile-alt"></i> Pay with M-Pesa
+                    </a>
+                </div>
+                {% elif order.status == 'paid' %}
+                <div class="payment-success-alert">
+                    <i class="fas fa-check-circle"></i>
+                    <span><strong>Payment Confirmed</strong> - Your order is being processed</span>
+                </div>
+                {% endif %}
+
+                <div class="order-items">
+                    <h4>Order Items:</h4>
+                    {% for item in order.items %}
+                    <div class="order-item">
+                        <div class="order-item-image">
+                            <img src="{{ item.product.image_path }}" alt="{{ item.product.name }}">
+                        </div>
+                        <div class="order-item-details">
+                            <div class="item-name-section">
+                                <span class="order-item-name">{{ item.product.name }}</span>
+                                <span class="item-unit-price">Unit Price: KSH {{ "%.2f"|format(item.price) }}</span>
+                            </div>
+                            <div class="item-quantity-section">
+                                <span class="item-quantity">Qty: {{ item.quantity }}</span>
+                                <span class="order-item-subtotal">KSH {{ "%.2f"|format(item.price * item.quantity) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-orders">
+            <div class="no-orders-icon">📦</div>
+            <h3>No Orders Yet</h3>
+            <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
+            <a href="{{ url_for('home') }}" class="btn btn-primary">Start Shopping</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.orders-list {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.order-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    padding: 25px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 20px;
+}
+
+.order-header-left h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 24px;
+}
+
+.order-date {
+    color: #666;
+    font-size: 14px;
+}
+
+.order-status {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.status-pending { background-color: #fff3cd; color: #856404; }
+.status-paid { background-color: #d1e7dd; color: #0f5132; }
+.status-processing { background-color: #cfe2ff; color: #084298; }
+.status-completed { background-color: #d1e7dd; color: #0f5132; }
+.status-cancelled { background-color: #f8d7da; color: #842029; }
+.status-failed { background-color: #f8d7da; color: #842029; }
+
+.order-summary {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.summary-label {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.summary-value {
+    color: #333;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.total-amount { color: #667eea; }
+
+.payment-alert {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+}
+
+.payment-alert-content {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.payment-alert-content i {
+    color: #856404;
+    font-size: 24px;
+    margin-top: 2px;
+}
+
+.payment-alert-text strong {
+    display: block;
+    color: #856404;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.payment-alert-text p {
+    margin: 0;
+    color: #664d03;
+    font-size: 14px;
+}
+
+.btn-pay-mpesa {
+    background: linear-gradient(135deg, #00a651 0%, #008c44 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3);
+}
+
+.btn-pay-mpesa:hover {
+    background: linear-gradient(135deg, #008c44 0%, #00753a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 166, 81, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-pay-mpesa i { font-size: 18px; }
+
+.payment-success-alert {
+    background: linear-gradient(135deg, #d1e7dd 0%, #a3cfbb 100%);
+    border-left: 4px solid #0f5132;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #0f5132;
+}
+
+.payment-success-alert i { font-size: 24px; }
+.payment-success-alert strong { font-weight: 700; }
+
+.order-items h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.order-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background-color: #fafafa;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    transition: transform 0.2s ease;
+}
+
+.order-item:hover {
+    transform: translateX(5px);
+    background-color: #f0f0f0;
+}
+
+.order-item-image { flex-shrink: 0; }
+
+.order-item-image img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.order-item-details {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-name-section {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.order-item-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+}
+
+.item-unit-price {
+    color: #666;
+    font-size: 13px;
+}
+
+.item-quantity-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.item-quantity {
+    background-color: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.order-item-subtotal {
+    font-weight: 700;
+    color: #333;
+    font-size: 18px;
+}
+
+.no-orders {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.no-orders-icon { font-size: 80px; margin-bottom: 20px; }
+.no-orders h3 { color: #333; margin-bottom: 10px; }
+.no-orders p { color: #666; margin-bottom: 30px; font-size: 16px; }
+
+@media (max-width: 768px) {
+    .order-header { flex-direction: column; gap: 15px; }
+    .order-summary { flex-direction: column; gap: 15px; }
+    .payment-alert { flex-direction: column; align-items: stretch; }
+    .payment-alert-content { flex-direction: column; gap: 10px; }
+    .btn-pay-mpesa { width: 100%; justify-content: center; }
+    .order-item { flex-direction: column; }
+    .order-item-details { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .item-quantity-section {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+</style>
+{% endblock %}
