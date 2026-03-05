@@ -49,8 +49,8 @@ app.config['MAIL_DEFAULT_SENDER'] = 'ikendi377@gmail.com'
 app.config['ADMIN_EMAIL'] = 'ikendi377@gmail.com'
 
 # ── Admin credentials ────────────────────────────────────────────────────────
-ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
-ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin123')
+ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'adminstrator')
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'Administratorx')
 
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
 if not ANTHROPIC_API_KEY:
