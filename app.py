@@ -47,7 +47,7 @@ app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'ikendi377@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'jjzj hwzn yqpo umuw')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'ikendi377@gmail.com')
 app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL', 'ikendi377@gmail.com')
 
