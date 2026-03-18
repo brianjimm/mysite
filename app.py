@@ -58,7 +58,7 @@ app.config['MAIL_PASSWORD'] = os.environ.get('BREVO_API_KEY')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'ikendi377@gmail.com')
 app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL', 'ikendi377@gmail.com')
 
-ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'adminstrator')
+ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'administrator')
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'Administratorx')
 
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
