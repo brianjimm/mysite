@@ -32,8 +32,12 @@
                     <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=200&h=200&fit=crop&crop=center" alt="Cars and Spare Parts">
                 {% elif category.name == 'Duka' %}
                     <img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=200&h=200&fit=crop&crop=center" alt="Duka">
+                {% elif category.name == 'Interior decor & furniture' %}
+                    <img src="https://res.cloudinary.com/dbltnszmu/image/upload/v1779195757/tradioai_products/i1s6ffvbddxmgw2tydph.jpg" alt="Interior decor & furniture">
+                {% elif category.name == 'Agro Products' %}
+                    <img src="https://res.cloudinary.com/dbltnszmu/image/upload/v1780857661/tradioai_products/ahqpomkhmhfeozyv7spt.jpg" alt="Agro Products">
                 {% else %}
-                    <img src="https://res.cloudinary.com/dbltnszmu/image/upload/v1780857661/tradioai_products/ahqpomkhmhfeozyv7spt.jpg" alt="{{ category.name }}">
+                   <img src="https://res.cloudinary.com/dbltnszmu/image/upload/v1780857661/tradioai_products/ahqpomkhmhfeozyv7spt.jpg" alt="{{ category.name }}">
                 {% endif %}
             </div>
             <span class="category-pill-name">{{ category.name }}</span>
