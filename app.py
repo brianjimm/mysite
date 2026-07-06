@@ -1233,6 +1233,8 @@ def init_db():
             {'name': 'Electronics',             'description': 'Smartphones, chargers, and accessories'},
             {'name': 'Cars & Spare Parts',      'description': 'Vehicles and automotive parts'},
             {'name': 'Duka',                    'description': 'Fast-moving everyday shop items — soaps, sugar, rice, cigarettes & more'},
+            {'name': 'Interior decor & furniture', 'description': 'Home and office furniture, decor, and furnishings'},
+            {'name': 'Agro Products',              'description': 'Agricultural produce, seeds, fertilizers, and farm supplies'},
         ]
         for c in categories_data:
             db.session.add(Category(**c))
@@ -1249,10 +1251,28 @@ def init_db():
         else:
             print("ℹ️  Duka category already exists — no action needed.")
 
+        if not Category.query.filter_by(name='Interior decor & furniture').first():
+            db.session.add(Category(
+                name='Interior decor & furniture',
+                description='Home and office furniture, decor, and furnishings'
+            ))
+            db.session.commit()
+            print("✅ Interior decor & furniture category added.")
+        else:
+            print("ℹ️  Interior decor & furniture already exists — no action needed.")
 
-with app.app_context():
-    try:
-        init_db()
+        if not Category.query.filter_by(name='Agro Products').first():
+            db.session.add(Category(
+                name='Agro Products',
+                description='Agricultural produce, seeds, fertilizers, and farm supplies'
+            ))
+            db.session.commit()
+            print("✅ Agro Products category added.")
+        else:
+            print("ℹ️  Agro Products already exists — no action needed.")
+   with app.app_context():
+       try:
+        init_db() 
         print("✅ Database initialised successfully.")
     except Exception as e:
         print(f"⚠️ Startup DB init failed: {e}")
