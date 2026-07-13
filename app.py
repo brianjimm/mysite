@@ -1219,7 +1219,10 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
-
+@app.route('/debug-categories')
+def debug_categories():
+    cats = Category.query.all()
+    return '<br>'.join([f"ID:{c.id} | NAME: '{c.name}'" for c in cats])
 
 # ── Database initialisation & seeding ───────────────────────────────────────
 
