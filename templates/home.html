@@ -31,10 +31,10 @@
                     <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=200&h=200&fit=crop&crop=center" alt="Cars and Spare Parts">
                 {% elif category.name == 'Duka' %}
                     <img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=200&h=200&fit=crop&crop=center" alt="Duka">
-                {% elif category.id == 7 %}
-                    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&h=200&fit=crop&crop=center" alt="Interior decor & furniture">
-                {% elif category.id == 8 %}
-                    <img src="https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=200&h=200&fit=crop&crop=center" alt="Agro Products">
+                {% elif 'nterior' in category.name %}
+                    <img src="https://res.cloudinary.com/dbltnszmu/image/upload/v1779195757/tradioai_products/i1s6ffvbddxmgw2tydph.jpg" alt="Interior Decor & Furniture">
+                {% elif 'gro' in category.name %}
+                    <img src="https://res.cloudinary.com/dbltnszmu/image/upload/v1780857661/tradioai_products/ahqpomkhmhfeozyv7spt.jpg" alt="Agro Products">
                 {% else %}
                     <img src="https://placehold.co/200x200?text={{ category.name }}" alt="{{ category.name }}">
                  {% endif %}
