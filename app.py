@@ -1269,7 +1269,7 @@ def init_db():
             print("✅ Agro Products category added.")
         else:
             print("ℹ️  Agro Products already exists — no action needed.")
-   with app.app_context():
+ with app.app_context():
        try:
         init_db() 
         print("✅ Database initialised successfully.")
