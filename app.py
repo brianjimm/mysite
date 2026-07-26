@@ -1269,12 +1269,15 @@ def init_db():
             print("✅ Agro Products category added.")
         else:
             print("ℹ️  Agro Products already exists — no action needed.")
- with app.app_context():
-       try:
-        init_db() 
+
+
+with app.app_context():
+    try:
+        init_db()
         print("✅ Database initialised successfully.")
     except Exception as e:
         print(f"⚠️ Startup DB init failed: {e}")
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
