@@ -20,7 +20,14 @@ import cloudinary.uploader
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__) 
+
+
+app.config['GA_MEASUREMENT_ID'] = os.environ.get('GA_MEASUREMENT_ID')
+
+@app.context_processor 
+def inject_ga_id():
+    return dict(ga_id=app.config.get('GA_MEASUREMENT_ID'))
 
 # ── Core config ──────────────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-dev-key-change-in-production')
