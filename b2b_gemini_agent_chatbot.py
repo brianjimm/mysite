@@ -425,7 +425,7 @@ def init_b2b_gemini_agent_chatbot(app, db, Product, Category, send_email,
                     system_instruction=SYSTEM_PROMPT,
                     tools=[TOOLS],
                     temperature=0.4,
-                    max_output_tokens=800,
+                    max_output_tokens=2048,
                 ),
             )
 
