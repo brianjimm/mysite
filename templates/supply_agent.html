@@ -1,0 +1,142 @@
+{% extends 'admin/base.html' %}
+{% block title %}Supply Agent{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h1>🤖 Supply Agent</h1>
+  <a href="{{ url_for('admin_products') }}" class="btn">← Products</a>
+</div>
+
+<div class="card" style="padding:16px 20px">
+  <p style="font-size:13px;color:#667;margin-bottom:8px">
+    Paste a supplier page link and say what to add. Example:
+    <i>Add the hoes from https://supplier.co.ke/fork-jembe to Agro Products, stock 50 each</i>
+  </p>
+  <textarea id="sa-ins" rows="3" style="width:100%" placeholder="Add the products from https://... to [category], stock [number] each"></textarea>
+  <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;margin:10px 0">
+    <input type="checkbox" id="sa-rights" style="margin-top:3px">
+    <span>I confirm this supplier has given KairuAI permission to use their product photos and details.</span>
+  </label>
+  <button id="sa-go" class="btn btn-primary">Find products</button>
+  <div id="sa-status" style="margin-top:10px;font-size:13px"></div>
+</div>
+
+<div id="sa-list"></div>
+<div id="sa-bar" style="display:none;margin:12px 0"><button id="sa-add" class="btn btn-primary">Add selected products</button></div>
+<div id="sa-done"></div>
+
+<style>
+  .sa-card{background:#fff;border-radius:12px;padding:14px;margin:10px 0;box-shadow:0 1px 6px rgba(0,0,0,.08);display:flex;gap:14px;flex-wrap:wrap}
+  .sa-img{width:120px;height:120px;object-fit:contain;background:#f4f4f8;border-radius:8px;flex-shrink:0}
+  .sa-img.none{display:flex;align-items:center;justify-content:center;font-size:11px;color:#999;text-align:center;padding:6px}
+  .sa-f{flex:1;min-width:230px}
+  .sa-f label{display:block;font-size:11px;color:#667;margin-top:6px}
+  .sa-f input,.sa-f select,.sa-f textarea{width:100%}
+  .sa-row{display:flex;gap:8px}.sa-row>div{flex:1}
+  .sa-w{font-size:12px;color:#b45309;margin-top:6px}.sa-ok{color:#15803d}.sa-bad{color:#b91c1c}
+</style>
+
+<script>
+(function () {
+  const CATS = {{ categories|tojson }};
+  const $ = id => document.getElementById(id);
+  let items = [];
+  let contacts = [];
+
+  function status(msg) { $('sa-status').textContent = msg || ''; }
+  async function post(url, body) {
+    const r = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+    let d = {}; try { d = await r.json(); } catch (e) {}
+    if (!r.ok) throw new Error(d.error || ('Error ' + r.status));
+    return d;
+  }
+  function el(tag, props, kids) {
+    const n = document.createElement(tag);
+    Object.assign(n, props || {});
+    (kids || []).forEach(k => n.appendChild(typeof k === 'string' ? document.createTextNode(k) : k));
+    return n;
+  }
+  function field(label, input) { return el('div', {}, [el('label', {textContent: label}), input]); }
+  function bind(input, it, key, num) {
+    input.addEventListener('input', () => { it[key] = num ? input.value : input.value; });
+    return input;
+  }
+
+  function render(notes) {
+    const list = $('sa-list'); list.innerHTML = '';
+    (notes || []).forEach(n => list.appendChild(el('div', {className: 'sa-w', textContent: n})));
+    contacts.forEach(c => {
+      const join = v => (Array.isArray(v) ? v.join(', ') : (v || ''));
+      c.phones = join(c.phones); c.emails = join(c.emails);
+      list.appendChild(el('div', {className: 'sa-card'}, [el('div', {className: 'sa-f'}, [
+        el('label', {textContent: '🏭 Supplier contacts found on ' + c.source_url + ' (edit or add; emailed to you when you add products)'}),
+        field('Supplier name', bind(el('input', {value: c.name || ''}), c, 'name')),
+        field('Phone(s)', bind(el('input', {value: c.phones, placeholder: 'none found, type one'}), c, 'phones')),
+        field('Email(s)', bind(el('input', {value: c.emails, placeholder: 'none found, type one'}), c, 'emails'))
+      ])]));
+    });
+    items.forEach(it => {
+      const pick = el('input', {type: 'checkbox', checked: !it.duplicate});
+      it.pick = pick;
+      const img = it.image_source && it.image_ok
+        ? el('img', {className: 'sa-img', src: it.image_source, referrerPolicy: 'no-referrer'})
+        : el('div', {className: 'sa-img none', textContent: 'No image'});
+      const cat = el('select', {}, [el('option', {value: '', textContent: 'Select category…'})]
+        .concat(CATS.map(c => el('option', {value: c.id, textContent: c.name}))));
+      cat.value = it.category_id || '';
+      cat.addEventListener('change', () => { it.category_id = cat.value; });
+      const f = el('div', {className: 'sa-f'}, [
+        el('label', {}, [pick, ' Add this product']),
+        field('Product name', bind(el('input', {value: it.name}), it, 'name')),
+        field('Category', cat),
+        el('div', {className: 'sa-row'}, [
+          field('Price (KSh)' + (it.supplier_price ? ' · supplier ' + it.supplier_price : ''),
+                bind(el('input', {type: 'number', step: '0.01', value: it.price == null ? '' : it.price}), it, 'price')),
+          field('Stock', bind(el('input', {type: 'number', value: it.stock}), it, 'stock'))
+        ]),
+        field('Description', bind(el('textarea', {rows: 2, value: it.description}), it, 'description')),
+        el('div', {className: 'sa-w ' + (it.image_ok ? 'sa-ok' : 'sa-bad'), textContent: 'Image: ' + it.image_note})
+      ].concat(it.warnings.map(w => el('div', {className: 'sa-w', textContent: '⚠ ' + w}))));
+      list.appendChild(el('div', {className: 'sa-card'}, [img, f]));
+    });
+    $('sa-bar').style.display = items.length ? 'block' : 'none';
+  }
+
+  $('sa-go').onclick = async () => {
+    $('sa-done').innerHTML = ''; items = []; render([]);
+    status('Reading the page and checking images… this can take up to a minute.');
+    $('sa-go').disabled = true;
+    try {
+      const d = await post("{{ url_for('supply_agent.supply_agent_preview') }}",
+                           {instruction: $('sa-ins').value, rights: $('sa-rights').checked});
+      items = d.products || [];
+      contacts = d.contacts || [];
+      status(items.length ? 'Review the products below, edit anything, then add them.' : 'No products found.');
+      render(d.notes);
+    } catch (e) { status('⚠ ' + e.message); }
+    $('sa-go').disabled = false;
+  };
+
+  $('sa-add').onclick = async () => {
+    const chosen = items.filter(it => it.pick.checked).map(it => ({
+      name: it.name, category_id: it.category_id, price: it.price, stock: it.stock, description: it.description,
+      source_url: it.source_url, supplier_price: it.supplier_price,
+      image_source: it.image_ok ? it.image_source : null, image_token: it.image_ok ? it.image_token : null
+    }));
+    if (!chosen.length) { status('Tick at least one product.'); return; }
+    $('sa-add').disabled = true; status('Adding products…');
+    try {
+      const d = await post("{{ url_for('supply_agent.supply_agent_confirm') }}",
+                           {rights: $('sa-rights').checked, products: chosen,
+                            contacts: contacts.map(c => ({source_url: c.source_url, name: c.name, phones: c.phones, emails: c.emails, website: c.website}))});
+      const box = $('sa-done'); box.innerHTML = '';
+      d.results.forEach(r => box.appendChild(el('div', {className: 'sa-w ' + (r.ok ? 'sa-ok' : 'sa-bad'),
+        textContent: (r.ok ? '✅ ' : '❌ ') + r.name + ': ' + r.msg})));
+      (d.emails || []).forEach(m => box.appendChild(el('div', {className: 'sa-w ' + (m.sent ? 'sa-ok' : 'sa-bad'),
+        textContent: (m.sent ? '📧 Supplier contacts emailed to you: ' : '⚠ Contacts saved but the email failed: ') + (m.supplier || 'supplier')})));
+      status('Done.');
+    } catch (e) { status('⚠ ' + e.message); }
+    $('sa-add').disabled = false;
+  };
+})();
+</script>
+{% endblock %}
